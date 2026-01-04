@@ -24,7 +24,7 @@ const Uploader: React.FC = () => {
     });
 
     if (res.ok) {
-      setMessage("Success");
+      setMessage(await res.text());
     } else {
       setMessage("Upload failed");
     }
