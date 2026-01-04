@@ -4,12 +4,14 @@ import ai from "@/lib/ai";
 
 export const runtime = "nodejs";
 
-type ContactInfo = {
-  name?: string;
+type ProposalInfo = {
+  company?: string;
+  contactName?: string;
   email?: string;
   phone?: string;
-  company?: string;
   address?: string;
+  scope?: string;
+  description?: string;
 };
 
 export async function POST(req: Request) {
@@ -25,11 +27,11 @@ export async function POST(req: Request) {
 
   const pdfText = result.text.join("\n");
 
-  let contacts: ContactInfo;
+  let proposal: ProposalInfo;
   let aiResponse: string = "";
   try {
     aiResponse = await ai.prompt(`
-Extract contact information from the following text.
+Extract biller information from the following text.
 
 Return ONLY valid JSON.
 Do NOT wrap the JSON in markdown.
@@ -51,7 +53,7 @@ ${pdfText}
 `);
 
     console.log(aiResponse);
-    // contacts = JSON.parse(aiResponse);
+    proposal = JSON.parse(aiResponse);
   } catch (e) {
     console.log(e);
     return NextResponse.json(
@@ -60,9 +62,5 @@ ${pdfText}
     );
   }
 
-  return NextResponse.json({
-    totalPages: result.totalPages,
-    contacts: {},
-    raw: aiResponse,
-  });
+  return NextResponse.json({ proposal });
 }

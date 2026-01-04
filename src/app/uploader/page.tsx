@@ -1,8 +1,19 @@
 "use client";
 import React, { useState } from "react";
 
+type ProposalInfo = {
+  company?: string;
+  contactName?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  scope?: string;
+  description?: string;
+};
+
 const Uploader: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
+  const [proposal, setProposal] = useState<ProposalInfo | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -24,9 +35,12 @@ const Uploader: React.FC = () => {
     });
 
     if (res.ok) {
-      setMessage(await res.text());
+      const data = await res.json();
+      setProposal(data.proposal);
+      setMessage(null);
     } else {
       setMessage("Upload failed");
+      setProposal(null);
     }
   };
 
@@ -37,7 +51,35 @@ const Uploader: React.FC = () => {
         <input type="file" onChange={handleFileChange} />
         <button type="submit">Upload</button>
       </form>
+
       {message && <p>{message}</p>}
+
+      {proposal && (
+        <div>
+          <h2>Proposal Info</h2>
+          <p>
+            <strong>Company:</strong> {proposal.company}
+          </p>
+          <p>
+            <strong>Contact Name:</strong> {proposal.contactName}
+          </p>
+          <p>
+            <strong>Email:</strong> {proposal.email}
+          </p>
+          <p>
+            <strong>Phone:</strong> {proposal.phone}
+          </p>
+          <p>
+            <strong>Address:</strong> {proposal.address}
+          </p>
+          <p>
+            <strong>Scope:</strong> {proposal.scope}
+          </p>
+          <p>
+            <strong>Description:</strong> {proposal.description}
+          </p>
+        </div>
+      )}
     </div>
   );
 };
