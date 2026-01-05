@@ -13,7 +13,7 @@ This is a Next.js proof-of-concept application for managing ITT proposals. Users
 
 4. **Invite** – Users select proposals from a table and send bid invitations. The system supports individual and bulk actions and navigates to a confirmation page when complete.
 
-The frontend (Next.js) communicates with Supabase for database operations, keeping backend and frontend separate for security.
+The frontend (Next.js) communicates with Supabase for database operations.
 
 # Architecture Choices
 
