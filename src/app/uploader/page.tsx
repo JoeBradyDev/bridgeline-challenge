@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 
 type ProposalInfo = {
   company?: string;
@@ -12,6 +13,7 @@ type ProposalInfo = {
 };
 
 const Uploader: React.FC = () => {
+  const router = useRouter();
   const [file, setFile] = useState<File | null>(null);
   const [proposal, setProposal] = useState<ProposalInfo | null>(null);
   const [message, setMessage] = useState<string | null>(null);
@@ -62,7 +64,6 @@ const Uploader: React.FC = () => {
     if (!proposal) return;
 
     const formData = new FormData();
-    // Only include the editable proposal fields, not the file
     Object.entries(proposal).forEach(([key, value]) => {
       if (value) formData.append(key, value);
     });
@@ -74,7 +75,8 @@ const Uploader: React.FC = () => {
       });
 
       if (res.ok) {
-        setMessage("Proposal saved successfully!");
+        // Redirect to root page after successful save
+        router.push("/");
       } else {
         setMessage("Failed to save proposal");
       }
