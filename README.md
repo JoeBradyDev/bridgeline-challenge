@@ -37,7 +37,6 @@ The frontend (Next.js) communicates with Supabase for database operations.
 
 # What Could Be Improved
 * Email sending is not implemented; the app currently simulates invitations.
-* Confidence indicators for extracted data are not yet implemented.
 * Use a more robust backend framework for complex business logic.
 * Implement authentication for accessing the application
 * Componentize forms, tables, and buttons for better reusability.
