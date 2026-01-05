@@ -34,7 +34,7 @@ export async function POST(req: Request) {
 Extract biller information from the following text.
 
 Return ONLY valid JSON.
-Do NOT wrap the JSON in markdown.
+Do NOT wrap the JSON in markdown (no \`\`\`json nor \`\`\`).
 Do NOT include fields with null values.
 Do NOT include explanations.
 Use proper capitalization instead of all caps.
@@ -43,7 +43,7 @@ Allowed fields:
 - company (biller company name)
 - contactName (biller contact name)
 - email (biller email)
-- phone (biller phone)
+- phone (biller phone formatted (123) 555-5555 ext. xxx)
 - address (biller address)
 - scope (trade/type of work inferred from context of text using title case)
 - description (description of work)
