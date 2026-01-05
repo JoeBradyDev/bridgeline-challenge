@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Sidebar from "../components/sidebar";
 
 type Proposal = {
@@ -16,6 +16,8 @@ type Proposal = {
 };
 
 export default function InviteToBidPage() {
+  const router = useRouter();
+
   const [proposals, setProposals] = useState<Proposal[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -34,13 +36,27 @@ export default function InviteToBidPage() {
         setLoading(false);
       }
     };
+
     fetchProposals();
   }, []);
 
+  const handleStepClick = (step: number) => {
+    if (step === 1) {
+      router.push("/uploader");
+      return;
+    }
+
+    if (step === 3) {
+      router.push("/invite-to-bid");
+    }
+  };
+
   const toggleSelect = (id: number) => {
-    const newSet = new Set(selectedIds);
-    newSet.has(id) ? newSet.delete(id) : newSet.add(id);
-    setSelectedIds(newSet);
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
   };
 
   const handleDelete = async (ids: number[]) => {
@@ -53,14 +69,15 @@ export default function InviteToBidPage() {
         body: JSON.stringify({ ids }),
         headers: { "Content-Type": "application/json" },
       });
+
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Delete failed");
 
       setProposals((prev) => prev.filter((p) => !ids.includes(p.id)));
       setSelectedIds((prev) => {
-        const newSet = new Set(prev);
-        ids.forEach((id) => newSet.delete(id));
-        return newSet;
+        const next = new Set(prev);
+        ids.forEach((id) => next.delete(id));
+        return next;
       });
     } catch (err: any) {
       alert(err.message);
@@ -73,28 +90,27 @@ export default function InviteToBidPage() {
     if (selectedIds.size === 0) return;
 
     alert(`Invitation emails sent to ${selectedIds.size} bidder(s).`);
-
     setSelectedIds(new Set());
   };
 
   return (
-    <Sidebar currentStep={3}>
+    <Sidebar currentStep={3} onStepClick={handleStepClick}>
       <h1>Proposals</h1>
 
       <div style={{ margin: "1rem 0" }}>
-        <Link
-          href="/uploader"
+        <button
+          onClick={() => router.push("/uploader")}
           style={{
-            display: "inline-block",
             padding: "8px 16px",
-            backgroundColor: "#0070f3",
+            backgroundColor: "#2563eb",
             color: "#fff",
             borderRadius: "4px",
-            textDecoration: "none",
+            border: "none",
+            cursor: "pointer",
           }}
         >
           Add Proposal
-        </Link>
+        </button>
 
         <button
           onClick={handleBulkDelete}

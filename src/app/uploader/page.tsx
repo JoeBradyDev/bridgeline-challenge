@@ -25,6 +25,25 @@ export default function UploaderPage() {
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
+  const resetToUpload = () => {
+    setFile(null);
+    setProposal(null);
+    setMessage(null);
+    setIsUploading(false);
+    setCurrentStep(1);
+  };
+
+  const handleStepClick = (step: number) => {
+    if (step === 1) {
+      resetToUpload();
+      return;
+    }
+
+    if (step === 3) {
+      router.push("/invite-to-bid");
+    }
+  };
+
   const handleFiles = (files: FileList | null) => {
     if (!files || files.length === 0) return;
     setFile(files[0]);
@@ -97,7 +116,7 @@ export default function UploaderPage() {
   };
 
   return (
-    <Sidebar currentStep={currentStep}>
+    <Sidebar currentStep={currentStep} onStepClick={handleStepClick}>
       <div>
         <h1>{currentStep === 1 ? "File Uploader" : "Review Proposal"}</h1>
 
@@ -138,6 +157,7 @@ export default function UploaderPage() {
                   ? file.name
                   : "Drag and drop a file here"}
               </div>
+
               {!file && (
                 <div
                   style={{
