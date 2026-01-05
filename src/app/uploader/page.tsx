@@ -1,7 +1,7 @@
 "use client";
 
 import Sidebar from "../components/sidebar";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 type ProposalInfo = {
@@ -16,43 +16,60 @@ type ProposalInfo = {
 
 export default function UploaderPage() {
   const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
   const [file, setFile] = useState<File | null>(null);
   const [proposal, setProposal] = useState<ProposalInfo | null>(null);
   const [message, setMessage] = useState<string | null>(null);
-  const [currentStep, setCurrentStep] = useState<number>(1); // Step state
+  const [currentStep, setCurrentStep] = useState<number>(1);
+  const [isDragging, setIsDragging] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) setFile(e.target.files[0]);
+  const handleFiles = (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    setFile(files[0]);
   };
 
-  const handleUpload = async (e: React.FormEvent) => {
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
+    setIsDragging(false);
+    handleFiles(e.dataTransfer.files);
+  };
+
+  useEffect(() => {
     if (!file) return;
 
-    const formData = new FormData();
-    formData.append("file", file);
+    const upload = async () => {
+      setIsUploading(true);
+      setMessage(null);
 
-    try {
-      const res = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
+      const formData = new FormData();
+      formData.append("file", file);
 
-      if (res.ok) {
-        const data = await res.json();
-        setProposal(data.proposal);
-        setMessage(null);
-        setCurrentStep(2); // <-- Highlight Review Proposals step
-      } else {
-        setMessage("Upload failed");
-        setProposal(null);
+      try {
+        const res = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          setProposal(data.proposal);
+          setCurrentStep(2);
+        } else {
+          setMessage("Upload failed");
+          setFile(null);
+        }
+      } catch {
+        setMessage("An error occurred during upload");
+        setFile(null);
+      } finally {
+        setIsUploading(false);
       }
-    } catch (e) {
-      console.error(e);
-      setMessage("An error occurred during upload");
-      setProposal(null);
-    }
-  };
+    };
+
+    upload();
+  }, [file]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -74,8 +91,7 @@ export default function UploaderPage() {
       const res = await fetch("/api/save", { method: "POST", body: formData });
       if (res.ok) router.push("/invite-to-bid");
       else setMessage("Failed to save proposal");
-    } catch (e) {
-      console.error(e);
+    } catch {
       setMessage("An error occurred while saving");
     }
   };
@@ -84,10 +100,58 @@ export default function UploaderPage() {
     <Sidebar currentStep={currentStep}>
       <div>
         <h1>{currentStep === 1 ? "File Uploader" : "Review Proposal"}</h1>
-        <form onSubmit={handleUpload}>
-          <input type="file" onChange={handleFileChange} />
-          <button type="submit">Upload</button>
-        </form>
+
+        {currentStep === 1 && (
+          <>
+            <input
+              ref={fileInputRef}
+              type="file"
+              hidden
+              onChange={(e) => handleFiles(e.target.files)}
+            />
+
+            <div
+              onClick={() => fileInputRef.current?.click()}
+              onDragOver={(e) => {
+                e.preventDefault();
+                setIsDragging(true);
+              }}
+              onDragLeave={() => setIsDragging(false)}
+              onDrop={handleDrop}
+              style={{
+                maxWidth: "420px",
+                margin: "40px auto",
+                border: "2px dashed #bbb",
+                borderRadius: "12px",
+                padding: "36px 24px",
+                textAlign: "center",
+                cursor: "pointer",
+                backgroundColor: isDragging ? "#f3f4f6" : "#fafafa",
+                transition: "background-color 0.15s ease, border-color 0.15s",
+                borderColor: isDragging ? "#888" : "#bbb",
+              }}
+            >
+              <div style={{ fontSize: "14px", color: "#555" }}>
+                {isUploading
+                  ? "Uploading…"
+                  : file
+                  ? file.name
+                  : "Drag and drop a file here"}
+              </div>
+              {!file && (
+                <div
+                  style={{
+                    marginTop: "6px",
+                    fontSize: "12px",
+                    color: "#777",
+                  }}
+                >
+                  or click to browse
+                </div>
+              )}
+            </div>
+          </>
+        )}
 
         {message && <p>{message}</p>}
 
@@ -98,6 +162,7 @@ export default function UploaderPage() {
               border: "1px solid #ccc",
               padding: "16px",
               borderRadius: "8px",
+              maxWidth: "720px",
             }}
           >
             <h2>Verify and Edit Proposal Info</h2>
