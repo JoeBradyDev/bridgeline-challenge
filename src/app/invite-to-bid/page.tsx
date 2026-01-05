@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Sidebar from "../components/sidebar";
+import { FaTrash } from "react-icons/fa";
 
 type Proposal = {
   id: number;
@@ -29,7 +30,7 @@ export default function InviteToBidPage() {
         const res = await fetch("/api/proposals");
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "Failed to fetch proposals");
-        setProposals(data);
+        setProposals(data || []);
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -45,7 +46,6 @@ export default function InviteToBidPage() {
       router.push("/uploader");
       return;
     }
-
     if (step === 3) {
       router.push("/invite-to-bid");
     }
@@ -57,6 +57,11 @@ export default function InviteToBidPage() {
       next.has(id) ? next.delete(id) : next.add(id);
       return next;
     });
+  };
+
+  const toggleSelectAll = (checked: boolean) => {
+    if (checked) setSelectedIds(new Set(proposals.map((p) => p.id)));
+    else setSelectedIds(new Set());
   };
 
   const handleDelete = async (ids: number[]) => {
@@ -97,16 +102,20 @@ export default function InviteToBidPage() {
     <Sidebar currentStep={3} onStepClick={handleStepClick}>
       <h1>Proposals</h1>
 
-      <div style={{ margin: "1rem 0" }}>
+      <div style={{ margin: "1rem 0", display: "flex", gap: "1rem" }}>
         <button
           onClick={() => router.push("/uploader")}
           style={{
-            padding: "8px 16px",
+            display: "flex",
+            alignItems: "center",
+            gap: "6px",
+            padding: "10px 20px",
             backgroundColor: "#2563eb",
             color: "#fff",
-            borderRadius: "4px",
+            borderRadius: "8px",
             border: "none",
             cursor: "pointer",
+            fontWeight: 500,
           }}
         >
           Add Proposal
@@ -116,15 +125,19 @@ export default function InviteToBidPage() {
           onClick={handleBulkDelete}
           disabled={selectedIds.size === 0}
           style={{
-            marginLeft: "1rem",
-            padding: "8px 16px",
-            backgroundColor: selectedIds.size === 0 ? "#ccc" : "#d32f2f",
+            display: "flex",
+            alignItems: "center",
+            gap: "6px",
+            padding: "10px 20px",
+            backgroundColor: selectedIds.size === 0 ? "#9ca3af" : "#d32f2f",
             color: "#fff",
-            borderRadius: "4px",
+            borderRadius: "8px",
             border: "none",
             cursor: selectedIds.size === 0 ? "not-allowed" : "pointer",
+            fontWeight: 500,
           }}
         >
+          <FaTrash />
           Delete Selected
         </button>
 
@@ -132,13 +145,16 @@ export default function InviteToBidPage() {
           onClick={handleInviteToBid}
           disabled={selectedIds.size === 0}
           style={{
-            marginLeft: "1rem",
-            padding: "8px 16px",
-            backgroundColor: selectedIds.size === 0 ? "#ccc" : "#2e7d32",
+            display: "flex",
+            alignItems: "center",
+            gap: "6px",
+            padding: "10px 20px",
+            backgroundColor: selectedIds.size === 0 ? "#9ca3af" : "#2e7d32",
             color: "#fff",
-            borderRadius: "4px",
+            borderRadius: "8px",
             border: "none",
             cursor: selectedIds.size === 0 ? "not-allowed" : "pointer",
+            fontWeight: 500,
           }}
         >
           Invite to Bid
@@ -158,8 +174,23 @@ export default function InviteToBidPage() {
         >
           <thead>
             <tr>
+              <th
+                style={{
+                  border: "1px solid #ccc",
+                  padding: "8px",
+                  textAlign: "center",
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={
+                    selectedIds.size === proposals.length &&
+                    proposals.length > 0
+                  }
+                  onChange={(e) => toggleSelectAll(e.target.checked)}
+                />
+              </th>
               {[
-                "Select",
                 "Company",
                 "Contact Name",
                 "Email",
@@ -186,6 +217,7 @@ export default function InviteToBidPage() {
                     border: "1px solid #ccc",
                     padding: "8px",
                     textAlign: "center",
+                    verticalAlign: "top",
                   }}
                 >
                   <input
@@ -194,25 +226,67 @@ export default function InviteToBidPage() {
                     onChange={() => toggleSelect(p.id)}
                   />
                 </td>
-                <td style={{ border: "1px solid #ccc", padding: "8px" }}>
+                <td
+                  style={{
+                    border: "1px solid #ccc",
+                    padding: "8px",
+                    verticalAlign: "top",
+                  }}
+                >
                   {p.company}
                 </td>
-                <td style={{ border: "1px solid #ccc", padding: "8px" }}>
+                <td
+                  style={{
+                    border: "1px solid #ccc",
+                    padding: "8px",
+                    verticalAlign: "top",
+                  }}
+                >
                   {p.contact_name}
                 </td>
-                <td style={{ border: "1px solid #ccc", padding: "8px" }}>
+                <td
+                  style={{
+                    border: "1px solid #ccc",
+                    padding: "8px",
+                    verticalAlign: "top",
+                  }}
+                >
                   {p.email}
                 </td>
-                <td style={{ border: "1px solid #ccc", padding: "8px" }}>
+                <td
+                  style={{
+                    border: "1px solid #ccc",
+                    padding: "8px",
+                    verticalAlign: "top",
+                  }}
+                >
                   {p.phone}
                 </td>
-                <td style={{ border: "1px solid #ccc", padding: "8px" }}>
+                <td
+                  style={{
+                    border: "1px solid #ccc",
+                    padding: "8px",
+                    verticalAlign: "top",
+                  }}
+                >
                   {p.address}
                 </td>
-                <td style={{ border: "1px solid #ccc", padding: "8px" }}>
+                <td
+                  style={{
+                    border: "1px solid #ccc",
+                    padding: "8px",
+                    verticalAlign: "top",
+                  }}
+                >
                   {p.scope}
                 </td>
-                <td style={{ border: "1px solid #ccc", padding: "8px" }}>
+                <td
+                  style={{
+                    border: "1px solid #ccc",
+                    padding: "8px",
+                    verticalAlign: "top",
+                  }}
+                >
                   {p.description}
                 </td>
                 <td
@@ -220,20 +294,26 @@ export default function InviteToBidPage() {
                     border: "1px solid #ccc",
                     padding: "8px",
                     textAlign: "center",
+                    verticalAlign: "top",
                   }}
                 >
                   <button
                     onClick={() => handleDelete([p.id])}
                     style={{
-                      padding: "4px 8px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      padding: "6px",
                       backgroundColor: "#d32f2f",
                       color: "#fff",
+                      borderRadius: "6px",
                       border: "none",
-                      borderRadius: "4px",
                       cursor: "pointer",
+                      fontSize: "14px",
                     }}
+                    title="Delete"
                   >
-                    Delete
+                    <FaTrash />
                   </button>
                 </td>
               </tr>
