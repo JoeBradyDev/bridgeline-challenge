@@ -69,6 +69,14 @@ export default function InviteToBidPage() {
 
   const handleBulkDelete = () => handleDelete(Array.from(selectedIds));
 
+  const handleInviteToBid = () => {
+    if (selectedIds.size === 0) return;
+
+    alert(`Invitation emails sent to ${selectedIds.size} bidder(s).`);
+
+    setSelectedIds(new Set());
+  };
+
   return (
     <Sidebar currentStep={3}>
       <h1>Proposals</h1>
@@ -102,6 +110,22 @@ export default function InviteToBidPage() {
           }}
         >
           Delete Selected
+        </button>
+
+        <button
+          onClick={handleInviteToBid}
+          disabled={selectedIds.size === 0}
+          style={{
+            marginLeft: "1rem",
+            padding: "8px 16px",
+            backgroundColor: selectedIds.size === 0 ? "#ccc" : "#2e7d32",
+            color: "#fff",
+            borderRadius: "4px",
+            border: "none",
+            cursor: selectedIds.size === 0 ? "not-allowed" : "pointer",
+          }}
+        >
+          Invite to Bid
         </button>
       </div>
 

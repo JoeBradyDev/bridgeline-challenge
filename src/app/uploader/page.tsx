@@ -19,6 +19,7 @@ export default function UploaderPage() {
   const [file, setFile] = useState<File | null>(null);
   const [proposal, setProposal] = useState<ProposalInfo | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const [currentStep, setCurrentStep] = useState<number>(1); // Step state
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) setFile(e.target.files[0]);
@@ -36,10 +37,12 @@ export default function UploaderPage() {
         method: "POST",
         body: formData,
       });
+
       if (res.ok) {
         const data = await res.json();
         setProposal(data.proposal);
         setMessage(null);
+        setCurrentStep(2); // <-- Highlight Review Proposals step
       } else {
         setMessage("Upload failed");
         setProposal(null);
@@ -78,9 +81,9 @@ export default function UploaderPage() {
   };
 
   return (
-    <Sidebar currentStep={1}>
+    <Sidebar currentStep={currentStep}>
       <div>
-        <h1>File Uploader</h1>
+        <h1>{currentStep === 1 ? "File Uploader" : "Review Proposal"}</h1>
         <form onSubmit={handleUpload}>
           <input type="file" onChange={handleFileChange} />
           <button type="submit">Upload</button>

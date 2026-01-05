@@ -17,6 +17,7 @@ const steps: Step[] = [
   { label: "Upload Documents", href: "/uploader" },
   { label: "Review Proposals", href: "/review-proposals" },
   { label: "Invite to Bid", href: "/invite-to-bid" },
+  { label: "Confirm", href: "/invite-to-bid" },
 ];
 
 export default function Sidebar({ currentStep, children }: SidebarProps) {
