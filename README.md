@@ -1,36 +1,46 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Proposal to Invitation to Bid Automation App
 
-## Getting Started
+# Overview
+This is a Next.js proof-of-concept application for managing ITT proposals. Users upload PDFs, review and edit extracted data, and send bid invitations. The interface follows a step-based workflow: Upload → Review → Invite → Confirm.
 
-First, run the development server:
+# How It Works
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. **Upload** – Users drag-and-drop or browse for PDF files. The file is sent to the /api/upload route.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. **Extraction** – The server extracts text using unpdf, sends it to the Gemini API for structured data parsing, and applies AI transformations to standardize formatting.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. **Review** – The extracted data is displayed in editable fields with per-field checkmarks. Users must verify all fields before saving.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. **Invite** – Users select proposals from a table and send bid invitations. The system supports individual and bulk actions and navigates to a confirmation page when complete.
 
-## Learn More
+The frontend (Next.js) communicates with Supabase for database operations, keeping backend and frontend separate for security.
 
-To learn more about Next.js, take a look at the following resources:
+# Architecture Choices
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+**Next.js** – Familiarity and good integration with Supabase for a lightweight full-stack POC.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+**Supabase** – Provides hosted PostgreSQL and authentication for secure data storage.
 
-## Deploy on Vercel
+**unpdf** – Node.js library for PDF text extraction.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+**Gemini API** – AI parsing of extracted text into structured proposal data.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**Frontend/Backend separation** ensures sensitive operations like AI calls and database writes remain secure.
+
+# Tradeoffs
+
+* Next.js is primarily a frontend framework; the backend is limited compared to dedicated solutions like Nest.js.
+
+* Something using Docker/Kubernetes would be able to scale better than this solution.
+* GCP would have more options for hosting than this Next.js/Vercel solution
+* AI responses may include markdown or inconsistent formatting; extra checks are required.
+
+# What Could Be Improved
+* Email sending is not implemented; the app currently simulates invitations.
+* Confidence indicators for extracted data are not yet implemented.
+* Use a more robust backend framework for complex business logic.
+* Implement authentication for accessing the application
+* Componentize forms, tables, and buttons for better reusability.
+* Add confidence scoring for extracted data and validation before invitations.
+
+
