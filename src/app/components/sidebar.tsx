@@ -1,6 +1,7 @@
 "use client";
 
 import React, { ReactNode } from "react";
+import Link from "next/link";
 import { FaUpload, FaFileAlt, FaEnvelope, FaCheck } from "react-icons/fa";
 
 type SidebarProps = {
@@ -72,7 +73,9 @@ export default function Sidebar({
             textTransform: "uppercase",
           }}
         >
-          Bid Workflow
+          <Link href="/" style={{ color: "inherit", textDecoration: "none" }}>
+            Bid Workflow
+          </Link>
         </div>
 
         <ul style={{ listStyle: "none", padding: 0, margin: 0, flex: 1 }}>

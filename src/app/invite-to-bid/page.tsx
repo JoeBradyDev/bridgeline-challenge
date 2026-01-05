@@ -42,13 +42,8 @@ export default function InviteToBidPage() {
   }, []);
 
   const handleStepClick = (step: number) => {
-    if (step === 1) {
-      router.push("/uploader");
-      return;
-    }
-    if (step === 3) {
-      router.push("/invite-to-bid");
-    }
+    if (step === 1) router.push("/uploader");
+    if (step === 3) router.push("/invite-to-bid");
   };
 
   const toggleSelect = (id: number) => {
@@ -94,8 +89,10 @@ export default function InviteToBidPage() {
   const handleInviteToBid = () => {
     if (selectedIds.size === 0) return;
 
-    alert(`Invitation emails sent to ${selectedIds.size} bidder(s).`);
     setSelectedIds(new Set());
+
+    // Navigate to confirmation page
+    router.push("/confirm");
   };
 
   return (
